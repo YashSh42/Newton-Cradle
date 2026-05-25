@@ -204,31 +204,17 @@ I tested 4 architectures, all with the same three output heads:
 
 **Architecture 1 (CNN + LSTM):** Baseline. CNN extracts spatial features per
 frame, LSTM processes the sequence. Sequential — each timestep depends on the
-previous. Reasonable performance (R²=0.942).
+previous..
 
 **Architecture 2 (CNN + Transformer):** Self-attention replaces LSTM. Every
 frame can directly attend to every other frame without sequential dependency.
-I expected this to identify the collision moment more precisely. It was slightly
-better (R²=0.960) and the attention visualization showed which frames it focused
-on — though it did not always focus on the collision frame as cleanly as expected.
 
 **Architecture 3 (3D CNN):** Treats the video as a spatiotemporal volume. 3D
-kernels detect patterns across space and time simultaneously. I expected this
-to be expensive and possibly overfit. It surprised me by being the best
-architecture with the fewest parameters (853K vs 1.7-2.3M for the others).
-R²=0.964, best OOD performance. The joint spatiotemporal convolutions seem to
-detect the collision event as a local pattern in space-time more efficiently
-than sequential models.
+kernels detect patterns across space and time simultaneously.
 
-**Architecture 4 (Delta CNN + LSTM):** Frame differences instead of raw frames.
-The most physically motivated input — delta frames encode velocity, which is
-what CoR depends on. I expected this to be the best. It was not. It performed
-well in-distribution (R²=0.942) but completely failed OOD (R²=-1.15 on unequal
-masses). It had memorized the momentum patterns of equal-mass horizontal
-collisions. When masses changed, the delta patterns looked different and the
-model could not adapt. This was the most instructive failure: "physically
-motivated input" does not guarantee physical generalization. The model learned
-the equal-mass delta signature, not the CoR equation.
+**Architecture 4 (ResNet18 + LSTM):** Transfer learning approach.
+A pretrained ResNet18 acts as the spatial feature extractor for each frame,
+paired with an LSTM to process the temporal sequence.
 
 ---
 
